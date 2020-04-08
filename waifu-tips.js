@@ -1,24 +1,7 @@
-function setCookie(e, t, i) {
-        var o = "";
-        if (i) {
-                var a = new Date; a.setTime(a.getTime() + 24 * i * 60 * 60 * 1e3);
-                o = "; expires=" + a.toUTCString();
-        }
-        document.cookie = e + "acai" + "=" + (t || "") + o + "; path=/";
-}
-function getCookie(e) {
-        for (var t = e + "acai" + "=",
-        i = document.cookie.split(";"), o = 0; o < i.length; o++) {
-                for (var a = i[o];
-                " " == a.charAt(0);) a = a.substring(1, a.length);
-	if (0 == a.indexOf(t)) 
-		return a.substring(t.length, a.length);
-        }
-        return null
-}
-function removeCookie(e) {
-        document.cookie = e + "acai" + "=; Max-Age=-99999999;"
-}
+/*
+ * Live2D Widget
+ * https://github.com/stevenjoezhang/live2d-widget
+ */
 
 function loadWidget(config) {
 	let { waifuPath, apiPath, cdnPath } = config;
@@ -32,7 +15,7 @@ function loadWidget(config) {
 	sessionStorage.removeItem("waifu-text");
 	document.body.insertAdjacentHTML("beforeend", `<div id="waifu">
 			<div id="waifu-tips"></div>
-			<canvas id="live2d" width="250" height="250"></canvas>
+			<canvas id="live2d" width="800" height="800"></canvas>
 			<div id="waifu-tool">
 				<span class="fa fa-lg fa-comment"></span>
 				<span class="fa fa-lg fa-paper-plane"></span>
@@ -48,6 +31,28 @@ function loadWidget(config) {
 		document.getElementById("waifu").style.bottom = 0;
 	}, 0);
 
+	function randomSelection(obj) {
+		return Array.isArray(obj) ? obj[Math.floor(Math.random() * obj.length)] : obj;
+	}
+	// 检测用户活动状态，并在空闲时显示消息
+	let userAction = false,
+		userActionTimer,
+		messageTimer,
+		messageArray = ["好久不见，日子过得好快呢……", "大坏蛋！你都多久没理人家了呀，嘤嘤嘤～", "嗨～快来逗我玩吧！", "拿小拳拳锤你胸口！", "记得把小家加入 Adblock 白名单哦！"];
+	window.addEventListener("mousemove", () => userAction = true);
+	window.addEventListener("keydown", () => userAction = true);
+	setInterval(() => {
+		if (userAction) {
+			userAction = false;
+			clearInterval(userActionTimer);
+			userActionTimer = null;
+		} else if (!userActionTimer) {
+			userActionTimer = setInterval(() => {
+				showMessage(randomSelection(messageArray), 6000, 9);
+			}, 20000);
+		}
+	}, 1000);
+
 	(function registerEventListener() {
 		document.querySelector("#waifu-tool .fa-comment").addEventListener("click", showHitokoto);
 		document.querySelector("#waifu-tool .fa-paper-plane").addEventListener("click", () => {
@@ -55,7 +60,7 @@ function loadWidget(config) {
 				if (!window.ASTEROIDSPLAYERS) window.ASTEROIDSPLAYERS = [];
 				window.ASTEROIDSPLAYERS.push(new Asteroids());
 			} else {
-				var script = document.createElement("script");
+				let script = document.createElement("script");
 				script.src = "https://cdn.jsdelivr.net/gh/GalaxyMimi/CDN/asteroids.js";
 				document.head.appendChild(script);
 			}
@@ -73,12 +78,13 @@ function loadWidget(config) {
 		document.querySelector("#waifu-tool .fa-times").addEventListener("click", () => {
 			localStorage.setItem("waifu-display", Date.now());
 			showMessage("愿你有一天能与重要的人重逢。", 2000, 11);
-			document.getElementById("waifu").style.bottom = "-400px";
+			document.getElementById("waifu").style.bottom = "-500px";
 			setTimeout(() => {
-				// document.getElementById("waifu").style.display = "none";
+				document.getElementById("waifu").style.display = "none";
+				document.getElementById("waifu-toggle").classList.add("waifu-toggle-active");
 			}, 3000);
 		});
-		var devtools = () => {};
+		let devtools = () => {};
 		console.log("%c", devtools);
 		devtools.toString = () => {
 			showMessage("哈哈，你打开了控制台，是想要看看我的小秘密吗？", 6000, 9);
@@ -92,9 +98,9 @@ function loadWidget(config) {
 	})();
 
 	(function welcomeMessage() {
-		var text;
+		let text;
 		if (location.pathname === "/") { // 如果是主页
-			var now = new Date().getHours();
+			let now = new Date().getHours();
 			if (now > 5 && now <= 7) text = "早上好！一日之计在于晨，美好的一天就要开始了。";
 			else if (now > 7 && now <= 11) text = "上午好！工作顺利嘛，不要久坐，多起来走动走动哦！";
 			else if (now > 11 && now <= 13) text = "中午了，工作了一个上午，现在是午餐时间！";
@@ -104,7 +110,7 @@ function loadWidget(config) {
 			else if (now > 21 && now <= 23) text = ["已经这么晚了呀，早点休息吧，晚安～", "深夜时要爱护眼睛呀！"];
 			else text = "你是夜猫子呀？这么晚还不睡觉，明天起的来嘛？";
 		} else if (document.referrer !== "") {
-			var referrer = new URL(document.referrer),
+			let referrer = new URL(document.referrer),
 				domain = referrer.hostname.split(".")[1];
 			if (location.hostname === referrer.hostname) text = `欢迎阅读<span>「${document.title.split(" - ")[0]}」</span>`;
 			else if (domain === "baidu") text = `Hello！来自 百度搜索 的朋友<br>你是搜索 <span>${referrer.search.split("&wd=")[1].split("&")[0]}</span> 找到的我吗？`;
@@ -116,34 +122,13 @@ function loadWidget(config) {
 		}
 		showMessage(text, 7000, 8);
 	})();
-	function randomSelection(obj) {
-		return Array.isArray(obj) ? obj[Math.floor(Math.random() * obj.length)] : obj;
-	}
-	// 检测用户活动状态，并在空闲时显示消息
-	var userAction = false,
-		userActionTimer,
-		messageTimer,
-		messageArray = ["好久不见，日子过得好快呢……", "大坏蛋！你都多久没理人家了呀，嘤嘤嘤～", "嗨～快来逗我玩吧！", "拿小拳拳锤你胸口！"];
-	window.addEventListener("mousemove", () => userAction = true);
-	window.addEventListener("keydown", () => userAction = true);
-	setInterval(() => {
-		if (userAction) {
-			userAction = false;
-			clearInterval(userActionTimer);
-			userActionTimer = null;
-		} else if (!userActionTimer) {
-			userActionTimer = setInterval(() => {
-				showMessage(randomSelection(messageArray), 6000, 9);
-			}, 20000);
-		}
-	}, 1000);
 
 	function showHitokoto() {
 		// 增加 hitokoto.cn 的 API
 		fetch("https://v1.hitokoto.cn")
 			.then(response => response.json())
 			.then(result => {
-				var text = `这句一言是 <span>${result.creator}</span>投稿的。`;
+				let text = `这句一言来自 <span>「${result.from}」</span>，是 <span>${result.creator}</span> 在 hitokoto.cn 投稿的。`;
 				showMessage(result.hitokoto, 6000, 9);
 				setTimeout(() => {
 					showMessage(text, 4000, 9);
@@ -152,31 +137,29 @@ function loadWidget(config) {
 	}
 
 	function showMessage(text, timeout, priority) {
-		if (!text) return;
-		if (!sessionStorage.getItem("waifu-text") || sessionStorage.getItem("waifu-text") <= priority) {
-			if (messageTimer) {
-				clearTimeout(messageTimer);
-				messageTimer = null;
-			}
-			text = randomSelection(text);
-			sessionStorage.setItem("waifu-text", priority);
-			var tips = document.getElementById("waifu-tips");
-			tips.innerHTML = text;
-			tips.classList.add("waifu-tips-active");
-			messageTimer = setTimeout(() => {
-				sessionStorage.removeItem("waifu-text");
-				tips.classList.remove("waifu-tips-active");
-			}, timeout);
+		if (!text || (sessionStorage.getItem("waifu-text") && sessionStorage.getItem("waifu-text") > priority)) return;
+		if (messageTimer) {
+			clearTimeout(messageTimer);
+			messageTimer = null;
 		}
+		text = randomSelection(text);
+		sessionStorage.setItem("waifu-text", priority);
+		let tips = document.getElementById("waifu-tips");
+		tips.innerHTML = text;
+		tips.classList.add("waifu-tips-active");
+		messageTimer = setTimeout(() => {
+			sessionStorage.removeItem("waifu-text");
+			tips.classList.remove("waifu-tips-active");
+		}, timeout);
 	}
 
 	(function initModel() {
-		var modelId = localStorage.getItem("modelId"),
+		let modelId = localStorage.getItem("modelId"),
 			modelTexturesId = localStorage.getItem("modelTexturesId");
 		if (modelId === null) {
 			// 首次访问加载 指定模型 的 指定材质
-			var modelId = 1, // 模型 ID
-				modelTexturesId = 53; // 材质 ID
+			modelId = 1; // 模型 ID
+			modelTexturesId = 53; // 材质 ID
 		}
 		loadModel(modelId, modelTexturesId);
 		fetch(waifuPath)
@@ -185,7 +168,7 @@ function loadWidget(config) {
 				result.mouseover.forEach(tips => {
 					window.addEventListener("mouseover", event => {
 						if (!event.target.matches(tips.selector)) return;
-						var text = randomSelection(tips.text);
+						let text = randomSelection(tips.text);
 						text = text.replace("{text}", event.target.innerText);
 						showMessage(text, 4000, 8);
 					});
@@ -193,17 +176,17 @@ function loadWidget(config) {
 				result.click.forEach(tips => {
 					window.addEventListener("click", event => {
 						if (!event.target.matches(tips.selector)) return;
-						var text = randomSelection(tips.text);
+						let text = randomSelection(tips.text);
 						text = text.replace("{text}", event.target.innerText);
 						showMessage(text, 4000, 8);
 					});
 				});
 				result.seasons.forEach(tips => {
-					var now = new Date(),
+					let now = new Date(),
 						after = tips.date.split("-")[0],
 						before = tips.date.split("-")[1] || after;
 					if ((after.split("/")[0] <= now.getMonth() + 1 && now.getMonth() + 1 <= before.split("/")[0]) && (after.split("/")[1] <= now.getDate() && now.getDate() <= before.split("/")[1])) {
-						var text = randomSelection(tips.text);
+						let text = randomSelection(tips.text);
 						text = text.replace("{year}", now.getFullYear());
 						//showMessage(text, 7000, true);
 						messageArray.push(text);
@@ -228,12 +211,12 @@ function loadWidget(config) {
 			loadlive2d("live2d", `${cdnPath}model/${target}/index.json`);
 		} else {
 			loadlive2d("live2d", `${apiPath}get/?id=${modelId}-${modelTexturesId}`);
-			console.log(`小不点 ${modelId}-${modelTexturesId} 加载完成`);
+			console.log(`Live2D 模型 ${modelId}-${modelTexturesId} 加载完成`);
 		}
 	}
 
 	async function loadRandModel() {
-		var modelId = localStorage.getItem("modelId"),
+		let modelId = localStorage.getItem("modelId"),
 			modelTexturesId = localStorage.getItem("modelTexturesId");
 		if (useCDN) {
 			if (!modelList) await loadModelList();
@@ -252,7 +235,7 @@ function loadWidget(config) {
 	}
 
 	async function loadOtherModel() {
-		var modelId = localStorage.getItem("modelId");
+		let modelId = localStorage.getItem("modelId");
 		if (useCDN) {
 			if (!modelList) await loadModelList();
 			let index = (++modelId >= modelList.models.length) ? 0 : modelId;
@@ -274,42 +257,27 @@ function initWidget(config, apiPath = "/") {
 			apiPath
 		};
 	}
-	document.body.insertAdjacentHTML("beforeend", `<div class="live2d-tool hide-live2d no-select" id="show_model"><div class="keys">Hide</div></div>
-		<div class="live2d-tool live2d-pio no-select" id="switch_live2d"><div class="keys">Tia</div></div>
-		<div class="live2d-tool switch-live2d no-select" id="switch_model"><div class="keys">Switch</div></div>
-		<div class="live2d-tool save-live2d no-select" id="save_pic"><div class="keys">Save</div></div>
-		`);
-	document.getElementById("switch_model").addEventListener("click", () => {
-		document.querySelector("#waifu-tool .fa-street-view").click();
-	});
-	document.getElementById("switch_live2d").addEventListener("click", () => {
-		document.querySelector("#waifu-tool .fa-user-circle").click();
-	});
-	document.getElementById("save_pic").addEventListener("click", () => {
-		document.querySelector("#waifu-tool .fa-camera-retro").click();
-	});
-	var toggle = document.getElementById("show_model");
+	document.body.insertAdjacentHTML("beforeend", `<div id="waifu-toggle">
+			<span>看板娘</span>
+		</div>`);
+	let toggle = document.getElementById("waifu-toggle");
 	toggle.addEventListener("click", () => {
-		"Hide" == getCookie("live2d") ? setTimeout(function() {
-                document.body.clientWidth > 860 && ($(".hide-live2d").css("bottom", "66px"), $(".save-live2d, .switch-live2d, .live2d-pio, .live2d-tia").addClass("hide-live2d-tool")),
-                $(".hide-live2d .keys").html("Show"),
-		document.querySelector("#waifu-tool .fa-times").click(),
-                setCookie("live2d", "Show", 7)
-        },
-        10) : setTimeout(function() {
-                document.body.clientWidth > 860 && ($(".hide-live2d").css("bottom", "185px"), $(".save-live2d, .switch-live2d, .live2d-pio, .live2d-tia").removeClass("hide-live2d-tool")),
-                $(".hide-live2d .keys").html("Hide"),
-		localStorage.removeItem("waifu-display"),
-				document.getElementById("waifu").style.display = "",
-				document.getElementById("waifu").style.bottom = 0,
-                setCookie("live2d", "Hide", 7),
-                setCookie("dontwantlive2d", "no", 7)
-        },
-        10)
+		toggle.classList.remove("waifu-toggle-active");
+		if (toggle.getAttribute("first-time")) {
+			loadWidget(config);
+			toggle.removeAttribute("first-time");
+		} else {
+			localStorage.removeItem("waifu-display");
+			document.getElementById("waifu").style.display = "";
+			setTimeout(() => {
+				document.getElementById("waifu").style.bottom = 0;
+			}, 0);
+		}
 	});
 	if (localStorage.getItem("waifu-display") && Date.now() - localStorage.getItem("waifu-display") <= 86400000) {
 		toggle.setAttribute("first-time", true);
 		setTimeout(() => {
+			toggle.classList.add("waifu-toggle-active");
 		}, 0);
 	} else {
 		loadWidget(config);
