@@ -1,6 +1,6 @@
 // 注意：live2d_path 参数应使用绝对路径
-const live2d_path = "https://cdn.jsdelivr.net/gh/Javid-Xi/Live2d@latest/";
-const tips_path = "https://cdn.jsdelivr.net/gh/Javid-Xi/Live2d@latest/";
+const live2d_path = "https://cdn.jsdelivr.net/gh/Javid-Xi/Live2d@1.6/";
+const tips_path = "https://cdn.jsdelivr.net/gh/Javid-Xi/Live2d@1.6/";
 // const live2d_path = "";
 //const live2d_path = "/live2d-widget/";
 
@@ -28,7 +28,7 @@ function loadExternalResource(url, type) {
 
 // 加载 waifu.css live2d.min.js waifu-tips.js
 	Promise.all([
-		loadExternalResource(live2d_path + "waifu.css", "css"),
+		loadExternalResource(live2d_path + "waifu.min.css", "css"),
 		loadExternalResource(live2d_path + "live2d.min.js", "js"),
 		loadExternalResource(live2d_path + "waifu-tips.js", "js")
 	]).then(() => {
@@ -38,22 +38,4 @@ function loadExternalResource(url, type) {
 			//cdnPath: "https://cdn.jsdelivr.net/gh/fghrsh/live2d_api/"
 		});
 	});
-console.log(`
-  く__,.ヘヽ.        /  ,ー､ 〉
-           ＼ ', !-─‐-i  /  /´
-           ／｀ｰ'       L/／｀ヽ､
-         /   ／,   /|   ,   ,       ',
-       ｲ   / /-‐/  ｉ  L_ ﾊ ヽ!   i
-        ﾚ ﾍ 7ｲ｀ﾄ   ﾚ'ｧ-ﾄ､!ハ|   |
-          !,/7 '0'     ´0iソ|    |
-          |.从"    _     ,,,, / |./    |
-          ﾚ'| i＞.､,,__  _,.イ /   .i   |
-            ﾚ'| | / k_７_/ﾚ'ヽ,  ﾊ.  |
-              | |/i 〈|/   i  ,.ﾍ |  i  |
-             .|/ /  ｉ：    ﾍ!    ＼  |
-              kヽ>､ﾊ    _,.ﾍ､    /､!
-              !'〈//｀Ｔ´', ＼ ｀'7'ｰr'
-              ﾚ'ヽL__|___i,___,ンﾚ|ノ
-                  ﾄ-,/  |___./
-                  'ｰ'    !_,.:
-`);
+console.log();
